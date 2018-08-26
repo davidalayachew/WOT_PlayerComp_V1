@@ -34,15 +34,31 @@ class WOT_PlayerComp_V1
    private final String APP_ID = "4cb32cc3859abbef155c5c3d49d4b52b";
    private final int LIMIT = 1;
    private Scanner scan;
-   private boolean program_Working = true;      
    
    private String response_from_URL = "";
+   private JSONObject temp_object;
+   private JSONArray temp_array;
    
    private String username;
    private String user_account_ID;
-   private JSONObject user_Object;
+   private JSONObject user_object;
+   private JSONObject user_play_records;
+   private int user_battle_avg_xp;
+   private int user_hits_Percents;
+   private int user_XP;
+   private double user_damage_ratio;
+   private double user_win_ratio;
    
    
+   private String enemy_username;
+   private String enemy_user_account_ID;
+   private JSONObject enemy_user_object;
+   private JSONObject enemy_user_play_records;
+   private int enemy_user_battle_avg_xp;
+   private int enemy_user_hits_Percents;
+   private int enemy_user_XP;
+   private double enemy_user_damage_ratio;
+   private double enemy_user_win_ratio;     
    
    private final String DEV_EMAIL = "davidalayachew@gmail.com";
    private final String USERNAME_DOESNT_EXIST = "That username does not exist.\nCheck for spelling, including proper case and no spaces.\n";
@@ -51,26 +67,256 @@ class WOT_PlayerComp_V1
    private final String ERROR = "\n!! ERROR !!\n";
    private final String URL_DID_NOT_WORK = "It seems that the URL did not work.\n" + THIS_IS_A_BUG;
    private final String ERROR_IN_STREAM = "It seems there was an error in opening the stream for the URL" + THIS_IS_A_BUG;
+   private final String COMPARE_TO_SELF = "\n\nWould you like to compare these statistics to yourself? (Y/N)";
+   private final String RESEARCH_ANOTHER_PLAYER = "\n\nWould you like to research another player? (Y/N)";
 
    WOT_PlayerComp_V1()
    {
    
       set_up();
       
+      retrieve_user_ID();
+      retrieve_user_data();
+      print_stats(this.username,
+         this.user_battle_avg_xp, 
+         this.user_hits_Percents, 
+         this.user_XP, 
+         this.user_damage_ratio, 
+         this.user_win_ratio);
+   
+      do
+      {
+      
+         retrieve_enemy_user_ID();
+         retrieve_enemy_user_data();
+         print_stats(this.enemy_username,
+            this.enemy_user_battle_avg_xp, 
+            this.enemy_user_hits_Percents, 
+            this.enemy_user_XP, 
+            this.enemy_user_damage_ratio, 
+            this.enemy_user_win_ratio);
+         
+         if(question(COMPARE_TO_SELF) == true)
+         {
+         
+            //compare_stats();
+         
+         }
+         
+      }while(question(RESEARCH_ANOTHER_PLAYER) == true);
+   
+      //the_test_method();
+   
+   }
+   
+   void the_scratch_paper_method()
+   {
+   
+      double x = 18;
+      double y = 7;
+      print((x/y) + "");
+   
+   
+   }
+   
+   boolean question(String prompt)
+   {
+   
+      boolean result = true;
+      boolean valid_response = true;
+      String choice;
+   
+   
+         
+      do
+      {
+         
+         print(prompt);
+         choice = this.scan.next();            
+         
+         switch (choice)
+         {
+         
+            case "y":
+            case "Y":
+            case "yes":
+            case "Yes":
+            case "YES":
+               result = true;
+               valid_response = true;
+               break;
+               
+            case "n":
+            case "N":
+            case "no":
+            case "No":
+            case "NO":
+               result = false;
+               valid_response = true;
+               break;
+               
+            default:
+               valid_response = false;
+               print("INVALID RESPONSE\nTry again.\n\n");
+               break;
+               
+         
+         }
+      
+      }while(valid_response == false);
+   
+            
+      return result;
+   
+   }
+   
+   void compare_stats()
+   {
+   
+   
+   
+   }
+   
+   void print_stats(
+   String username,
+   int battle_avg_xp,
+   int hits_percents,
+   int XP, 
+   double damage_ratio, 
+   double win_ratio
+   )
+   {
+   
+      print("Here are the statistics for the player " + username 
+            + "\n\n" + battle_avg_xp + " = Average Battle Experience\n" 
+            + hits_percents + "% = Average Percentage for Hit Per Shot\n"
+            + XP + " = Total Game EXP\n"
+            + damage_ratio + "% = Average Percentage for Damage Dealt to Damage Received\n"
+            + win_ratio + "% = Average Percentage for Wins to Number of Battles\n\n");
+   
+   }
+   
+   void retrieve_user_data()
+   {
+    
+      String temp;
+         
+      temp = retrieve_all_stats(this.user_account_ID);
+      this.user_play_records = JSONObject.fromObject(temp);
+      
+      this.user_battle_avg_xp = this.user_play_records.getInt("battle_avg_xp");
+      
+      double wins = this.user_play_records.getInt("wins");
+   
+      double draws = this.user_play_records.getInt("draws");
+   
+      double losses = this.user_play_records.getInt("losses");
+         
+      this.user_hits_Percents = this.user_play_records.getInt("hits_percents");
+         
+      this.user_XP = this.user_play_records.getInt("xp");
+   
+      double damage_dealt = this.user_play_records.getInt("damage_dealt");
+   
+      double damage_received = this.user_play_records.getInt("damage_received");
+   
+      this.user_damage_ratio = damage_dealt/damage_received;
+      this.user_damage_ratio *=100;
+   
+      this.user_win_ratio = (double)((double)(wins)/(double)(wins + draws + losses + 1));
+      this.user_win_ratio *=100;    
+              
+   }
+   
+   void retrieve_enemy_user_data()
+   {
+    
+      String temp;
+         
+      temp = retrieve_all_stats(this.enemy_user_account_ID);
+      this.enemy_user_play_records = JSONObject.fromObject(temp);
+      
+      this.enemy_user_battle_avg_xp = this.enemy_user_play_records.getInt("battle_avg_xp");
+      
+      double wins = this.enemy_user_play_records.getInt("wins");
+   
+      double draws = this.enemy_user_play_records.getInt("draws");
+   
+      double losses = this.enemy_user_play_records.getInt("losses");
+         
+      this.enemy_user_hits_Percents = this.enemy_user_play_records.getInt("hits_percents");
+         
+      this.enemy_user_XP = this.enemy_user_play_records.getInt("xp");
+   
+      double damage_dealt = this.enemy_user_play_records.getInt("damage_dealt");
+   
+      double damage_received = this.enemy_user_play_records.getInt("damage_received");
+   
+      this.enemy_user_damage_ratio = damage_dealt/damage_received;
+      this.enemy_user_damage_ratio *=100;
+   
+      this.enemy_user_win_ratio = (double)((double)(wins)/(double)(wins + draws + losses + 1));
+      this.enemy_user_win_ratio *=100;    
+              
+   }
+   
+   String retrieve_all_stats(String ID)
+   {
+   
+      read_URL("http://api.worldoftanks.com/wot/account/info/?application_id=4cb32cc3859abbef155c5c3d49d4b52b&account_id=" + ID);
+      this.temp_object = JSONObject.fromObject(this.response_from_URL);//retrieve and store all user play records
+      
+                  //goes through and captures all info on opponent
+         
+         /** goes into the JSONObject to retrieve data */
+      this.temp_object = this.temp_object.getJSONObject("data");
+         /** goes into data to retrieve userID */
+      this.temp_object = this.temp_object.getJSONObject(ID);
+         /** goes into ID to retrieve stats */
+      this.temp_object = this.temp_object.getJSONObject("statistics");
+         /** goes into stats to get the general data under the label "all" */
+      this.temp_object = this.temp_object.getJSONObject("all");
+      
+      return this.temp_object.toString();
+   
+   }
+   
+   void retrieve_user_ID()
+   {
+   
       do{
       
-         program_Working = ensure_we_have_proper_username();
+         this.username = get_username("Enter your username.");
       
-      }while(program_Working == false);
+      }while(ensure_we_have_proper_username(this.username) != true);
       
-      this.user_account_ID = retrieve_account_id(this.user_Object);
+      this.user_object = JSONObject.fromObject(this.response_from_URL);//now that we know the proper username, we set user_object
+      
+      this.user_account_ID = retrieve_account_id(this.user_object);
       print("Here is your userID - " + this.user_account_ID + "\n\n");
+   
+   }
+   
+   void retrieve_enemy_user_ID()
+   {
+   
+      do{
+      
+         this.enemy_username = get_username("Enter enemy username.");
+      
+      }while(ensure_we_have_proper_username(this.enemy_username) != true);
+      
+      this.enemy_user_object = JSONObject.fromObject(this.response_from_URL);//now that we know the proper username, we set user_object
+      
+      this.enemy_user_account_ID = retrieve_account_id(this.enemy_user_object);
+      print("Here is the enemy's userID - " + this.enemy_user_account_ID + "\n\n");
    
    }
    
    
    void print(String message)
    {//this method will be a godsend when it comes time to upgrade to V2
+    //at least, slightly so
    
       System.out.println(message);
    
@@ -83,7 +329,7 @@ class WOT_PlayerComp_V1
    
    }
    
-   void pretty_Print(String text)
+   void pretty_print(String text)
    {
    
       String temp = JsonWriter.formatJson(text);
@@ -91,7 +337,15 @@ class WOT_PlayerComp_V1
    
    }
    
-   boolean ensure_we_have_proper_username()
+   String get_username(String prompt)
+   {
+   
+      print(prompt);//prompts user to enter a username
+      return this.scan.next();//scans user input
+   
+   }
+   
+   boolean ensure_we_have_proper_username(String username)
    {
    
       boolean result = true;//did the method succeed?
@@ -101,23 +355,22 @@ class WOT_PlayerComp_V1
       JSONObject transfer = new JSONObject();
       int count;//the number of names that the search returned
    
-      print("Enter your username.");//prompts user to enter their username
-      this.username = this.scan.next();//scans user input
+   
          
       result = read_URL(
          "http://api.worldoftanks.com/wot/account/list/?application_id=" + this.APP_ID
-         + "&search=" + this.username
+         + "&search=" + username
          + "&limit=" + this.LIMIT
          );//reads url to get the JSON data
       
-      this.user_Object = JSONObject.fromObject(this.response_from_URL);//build a JSONObject
+      this.temp_object = JSONObject.fromObject(this.response_from_URL);//build a JSONObject
       
-      status = this.user_Object.getString("status");//get status of search
+      status = this.temp_object.getString("status");//get status of search
          
       if(status.equals("ok"))//if the search was properly executed
       {
             
-         transfer = this.user_Object.getJSONObject("meta");
+         transfer = this.temp_object.getJSONObject("meta");
          count = transfer.getInt("count");   
          
          if(count == 0)//if no names match up with input
@@ -157,11 +410,11 @@ class WOT_PlayerComp_V1
       String result = "";
                   
       /** json array is made from data */
-      JSONArray dataArray = (object.getJSONArray("data"));
+      this.temp_array = object.getJSONArray("data");
       /** 1st element from array of JSONObjects is stored into a JSONObject */
-      JSONObject data = dataArray.getJSONObject(0);
+      this.temp_object = this.temp_array.getJSONObject(0);
       
-      result = data.getString("account_id");
+      result = this.temp_object.getString("account_id");
    
       return result;
    
