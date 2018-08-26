@@ -1,6 +1,6 @@
 # WOT_PlayerComp_V1
 
-Status: currently incomplete
+Status: Incomplete
 
 Expected completion date = August 27 2018
 
