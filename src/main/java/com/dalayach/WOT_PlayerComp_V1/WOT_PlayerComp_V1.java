@@ -106,21 +106,9 @@ class WOT_PlayerComp_V1
          }
          
       }while(question(RESEARCH_ANOTHER_PLAYER) == true);
-   
-      //the_test_method();
-   
+         
    }
-   
-   void the_scratch_paper_method()
-   {
-   
-      double x = 18;
-      double y = 7;
-      print((x/y) + "");
-   
-   
-   }
-   
+
    boolean question(String prompt)
    {
    
