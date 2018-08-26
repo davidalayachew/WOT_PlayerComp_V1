@@ -48,7 +48,9 @@ class WOT_PlayerComp_V1
    private final String USERNAME_DOESNT_EXIST = "That username does not exist.\nCheck for spelling, including proper case and no spaces.\n";
    private final String THIS_IS_A_BUG = "This is a bug. Please contact the developer at " + DEV_EMAIL + " and this issue will be resolved.\nThank you for your cooperation.\n";
    private final String SEARCH_WAS_NOT_SUCCESSFUL = "Search was not successful, please pick a different name.\nRemember, usernames must be at least 3 characters long.\n";
-   private final String ERROR = "\n!! ERROR !!";
+   private final String ERROR = "\n!! ERROR !!\n";
+   private final String URL_DID_NOT_WORK = "It seems that the URL did not work.\n" + THIS_IS_A_BUG;
+   private final String ERROR_IN_STREAM = "It seems there was an error in opening the stream for the URL" + THIS_IS_A_BUG;
 
    WOT_PlayerComp_V1()
    {
@@ -60,6 +62,17 @@ class WOT_PlayerComp_V1
          program_Working = ensure_we_have_proper_username();
       
       }while(program_Working == false);
+      
+      this.user_account_ID = retrieve_account_id(this.user_Object);
+      print("Here is your userID - " + this.user_account_ID + "\n\n");
+   
+   }
+   
+   
+   void print(String message)
+   {//this method will be a godsend when it comes time to upgrade to V2
+   
+      System.out.println(message);
    
    }
    
@@ -74,7 +87,7 @@ class WOT_PlayerComp_V1
    {
    
       String temp = JsonWriter.formatJson(text);
-      System.out.println("" + temp);
+      print("" + temp);
    
    }
    
@@ -88,7 +101,7 @@ class WOT_PlayerComp_V1
       JSONObject transfer = new JSONObject();
       int count;//the number of names that the search returned
    
-      System.out.println("Enter your username.");//prompts user to enter their username
+      print("Enter your username.");//prompts user to enter their username
       this.username = this.scan.next();//scans user input
          
       result = read_URL(
@@ -111,7 +124,7 @@ class WOT_PlayerComp_V1
          {
             
             result = false;
-            System.out.println(USERNAME_DOESNT_EXIST);
+            print(USERNAME_DOESNT_EXIST);
             
          }
          
@@ -120,8 +133,8 @@ class WOT_PlayerComp_V1
       else if(status.equals("error"))
       {
                   
-         System.out.println(ERROR);
-         System.out.println(SEARCH_WAS_NOT_SUCCESSFUL);
+         print(ERROR);
+         print(SEARCH_WAS_NOT_SUCCESSFUL);
          result = false;
                      
       }
@@ -130,9 +143,25 @@ class WOT_PlayerComp_V1
       {
       
          result = false;
-         System.out.println(THIS_IS_A_BUG);
+         print(THIS_IS_A_BUG);
       
       }
+   
+      return result;
+   
+   }
+   
+   String retrieve_account_id(JSONObject object)
+   {
+          
+      String result = "";
+                  
+      /** json array is made from data */
+      JSONArray dataArray = (object.getJSONArray("data"));
+      /** 1st element from array of JSONObjects is stored into a JSONObject */
+      JSONObject data = dataArray.getJSONObject(0);
+      
+      result = data.getString("account_id");
    
       return result;
    
@@ -172,14 +201,14 @@ class WOT_PlayerComp_V1
       catch(MalformedURLException murle)
       {
       
-         System.out.println("It seems that the URL did not work.");
+         print(URL_DID_NOT_WORK);
          result = false;
       
       }
       catch(IOException ioe)
       {
       
-         System.out.println("It seems there was an error in opening the stream for the URL");
+         print(ERROR_IN_STREAM);
          result = false;
       
       }
