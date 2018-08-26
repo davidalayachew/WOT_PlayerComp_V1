@@ -5,6 +5,7 @@ import java.net.URL;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
 import com.cedarsoftware.util.io.JsonWriter;
@@ -193,7 +194,7 @@ class WOT_PlayerComp_V1
       {
       
          temp = calculate_points((user_trait - enemy_trait), enemy_trait);
-         print("YOU have a better " + trait + " than " + this.enemy_username + " ----- points = " + temp);
+         print("YOU have a better " + trait + " than " + this.enemy_username);
          this.user_chance += temp;
          this.enemy_user_chance += 20 - temp;
       
@@ -203,7 +204,7 @@ class WOT_PlayerComp_V1
       {
       
          temp = calculate_points((enemy_trait - user_trait), user_trait);
-         print(this.enemy_username + " has a better " + trait + " than you" + " ----- points = " + temp);
+         print(this.enemy_username + " has a better " + trait + " than you");
          this.enemy_user_chance += temp;
          this.user_chance += 20 - temp;
       
@@ -218,9 +219,18 @@ class WOT_PlayerComp_V1
    
    }
    
+   String clean_up_trailing_decimal_digits(double big_number)
+   {
+   
+      DecimalFormat numberFormat = new DecimalFormat("0.##");
+      return (numberFormat.format(big_number));
+   
+   }
+   
    void compare_stats()
    {
    
+      String clean_user_chance;
    
       who_has_better("Average Battle Experience", this.user_battle_avg_xp, this.enemy_user_battle_avg_xp);
    
@@ -231,8 +241,10 @@ class WOT_PlayerComp_V1
       who_has_better("Damage Dealt to Damage Received Ratio", this.user_damage_ratio, this.enemy_user_damage_ratio);
    
       who_has_better("Win Ratio", this.user_win_ratio, this.enemy_user_win_ratio);
+                   
+      clean_user_chance = clean_up_trailing_decimal_digits(this.user_chance);
                                             
-      print("\nYou have a " + this.user_chance + "% chance of winning.");//inform user of their chances of winning
+      print("\nYou have a " + clean_user_chance + "% chance of winning.");//inform user of their chances of winning
                        
    
    }
@@ -247,12 +259,15 @@ class WOT_PlayerComp_V1
    )
    {
    
+      String clean_damage_ratio = clean_up_trailing_decimal_digits(damage_ratio);
+      String clean_win_ratio = clean_up_trailing_decimal_digits(win_ratio);
+   
       print("Here are the statistics for the player " + username 
             + "\n\n" + battle_avg_xp + " = Average Battle Experience\n" 
             + hits_percents + "% = Average Percentage of Hits per Shot\n"
             + XP + " = Lifetime EXP Total\n"
-            + damage_ratio + "% = Damage Dealt to Damage Received Ratio\n"
-            + win_ratio + "% = Win Ratio\n\n");
+            + clean_damage_ratio + "% = Damage Dealt to Damage Received Ratio\n"
+            + clean_win_ratio + "% = Win Ratio\n\n");
    
    }
    
