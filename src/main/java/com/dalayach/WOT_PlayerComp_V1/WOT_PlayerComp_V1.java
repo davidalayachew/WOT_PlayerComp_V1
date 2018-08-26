@@ -44,10 +44,11 @@ class WOT_PlayerComp_V1
    private JSONObject user_object;
    private JSONObject user_play_records;
    private int user_battle_avg_xp;
-   private int user_hits_Percents;
+   private int user_hits_percents;
    private int user_XP;
    private double user_damage_ratio;
    private double user_win_ratio;
+   private double user_chance = 0;
    
    
    private String enemy_username;
@@ -55,10 +56,11 @@ class WOT_PlayerComp_V1
    private JSONObject enemy_user_object;
    private JSONObject enemy_user_play_records;
    private int enemy_user_battle_avg_xp;
-   private int enemy_user_hits_Percents;
+   private int enemy_user_hits_percents;
    private int enemy_user_XP;
    private double enemy_user_damage_ratio;
-   private double enemy_user_win_ratio;     
+   private double enemy_user_win_ratio;  
+   private double enemy_user_chance = 0;   
    
    private final String DEV_EMAIL = "davidalayachew@gmail.com";
    private final String USERNAME_DOESNT_EXIST = "That username does not exist.\nCheck for spelling, including proper case and no spaces.\n";
@@ -79,7 +81,7 @@ class WOT_PlayerComp_V1
       retrieve_user_data();
       print_stats(this.username,
          this.user_battle_avg_xp, 
-         this.user_hits_Percents, 
+         this.user_hits_percents, 
          this.user_XP, 
          this.user_damage_ratio, 
          this.user_win_ratio);
@@ -91,7 +93,7 @@ class WOT_PlayerComp_V1
          retrieve_enemy_user_data();
          print_stats(this.enemy_username,
             this.enemy_user_battle_avg_xp, 
-            this.enemy_user_hits_Percents, 
+            this.enemy_user_hits_percents, 
             this.enemy_user_XP, 
             this.enemy_user_damage_ratio, 
             this.enemy_user_win_ratio);
@@ -99,7 +101,7 @@ class WOT_PlayerComp_V1
          if(question(COMPARE_TO_SELF) == true)
          {
          
-            //compare_stats();
+            compare_stats();
          
          }
          
@@ -170,10 +172,80 @@ class WOT_PlayerComp_V1
    
    }
    
+   double calculate_points(double difference, double smaller_value)
+   {
+   
+      double result;
+   
+      if(difference > smaller_value)//if the difference between traits is so great that
+      {                             //one trait is over twice the size of the other
+      
+         result = 20;               //automatically award the highest point value possible
+      
+      }
+      
+      else
+      {
+      
+         result = (difference + smaller_value)/(smaller_value);
+         result *= 10;
+      
+      }
+      
+      return result;
+   
+   }
+   
+   void who_has_better(String trait, double user_trait, double enemy_trait)
+   {
+   
+      double temp = 0;
+   
+      if(user_trait > enemy_trait)
+      {
+      
+         temp = calculate_points((user_trait - enemy_trait), enemy_trait);
+         print("YOU have a better " + trait + " than " + this.enemy_username + " ----- points = " + temp);
+         this.user_chance += temp;
+         this.enemy_user_chance += 20 - temp;
+      
+      }
+      
+      else if(user_trait < enemy_trait)
+      {
+      
+         temp = calculate_points((enemy_trait - user_trait), user_trait);
+         print(this.enemy_username + " has a better " + trait + " than you" + " ----- points = " + temp);
+         this.enemy_user_chance += temp;
+         this.user_chance += 20 - temp;
+      
+      }
+      
+      else
+      {
+      
+         print("SURPRISE! Both of you have the same " + trait + "!");
+      
+      }
+   
+   }
+   
    void compare_stats()
    {
    
    
+      who_has_better("Average Battle Experience", this.user_battle_avg_xp, this.enemy_user_battle_avg_xp);
+   
+      who_has_better("Average Percentage of Hits per Shot", this.user_hits_percents, this.enemy_user_hits_percents);
+   
+      who_has_better("Lifetime EXP Total", this.user_XP, this.enemy_user_XP);
+            
+      who_has_better("Damage Dealt to Damage Received Ratio", this.user_damage_ratio, this.enemy_user_damage_ratio);
+   
+      who_has_better("Win Ratio", this.user_win_ratio, this.enemy_user_win_ratio);
+                                            
+      print("\nYou have a " + this.user_chance + "% chance of winning.");//inform user of their chances of winning
+                       
    
    }
    
@@ -189,10 +261,10 @@ class WOT_PlayerComp_V1
    
       print("Here are the statistics for the player " + username 
             + "\n\n" + battle_avg_xp + " = Average Battle Experience\n" 
-            + hits_percents + "% = Average Percentage for Hit Per Shot\n"
-            + XP + " = Total Game EXP\n"
-            + damage_ratio + "% = Average Percentage for Damage Dealt to Damage Received\n"
-            + win_ratio + "% = Average Percentage for Wins to Number of Battles\n\n");
+            + hits_percents + "% = Average Percentage of Hits per Shot\n"
+            + XP + " = Lifetime EXP Total\n"
+            + damage_ratio + "% = Damage Dealt to Damage Received Ratio\n"
+            + win_ratio + "% = Win Ratio\n\n");
    
    }
    
@@ -212,7 +284,7 @@ class WOT_PlayerComp_V1
    
       double losses = this.user_play_records.getInt("losses");
          
-      this.user_hits_Percents = this.user_play_records.getInt("hits_percents");
+      this.user_hits_percents = this.user_play_records.getInt("hits_percents");
          
       this.user_XP = this.user_play_records.getInt("xp");
    
@@ -244,7 +316,7 @@ class WOT_PlayerComp_V1
    
       double losses = this.enemy_user_play_records.getInt("losses");
          
-      this.enemy_user_hits_Percents = this.enemy_user_play_records.getInt("hits_percents");
+      this.enemy_user_hits_percents = this.enemy_user_play_records.getInt("hits_percents");
          
       this.enemy_user_XP = this.enemy_user_play_records.getInt("xp");
    
