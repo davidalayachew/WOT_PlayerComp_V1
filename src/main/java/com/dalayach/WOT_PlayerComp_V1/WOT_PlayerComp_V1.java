@@ -22,10 +22,9 @@ import javax.swing.JOptionPane;
  *   @version 0.1
  */
    
-//Sources for methods 
-//http://na.wargaming.net/developers/api_explorer/wot/account/list/?application_id=4cb32cc3859abbef155c5c3d49d4b52b&http_method=GET
-//http://na.wargaming.net/developers/api_reference/wot/account/list/
-//http://na.wargaming.net/developers/api_reference/wot/account/info/
+   //Links
+   //https://developers.wargaming.net/reference/all/wot/account/list/?application_id=4cb32cc3859abbef155c5c3d49d4b52b&r_realm=na
+   //https://developers.wargaming.net/reference/all/wot/account/info/?application_id=4cb32cc3859abbef155c5c3d49d4b52b&r_realm=na
 
 
 //driver class
@@ -35,19 +34,32 @@ class WOT_PlayerComp_V1
    private final String APP_ID = "4cb32cc3859abbef155c5c3d49d4b52b";
    private final int LIMIT = 1;
    private Scanner scan;
-   private boolean status = true;      
+   private boolean program_Working = true;      
    
    private String response_from_URL = "";
    
    private String username;
    private String user_account_ID;
-   private JSONObject user_object;
+   private JSONObject user_Object;
+   
+   
+   
+   private final String DEV_EMAIL = "davidalayachew@gmail.com";
+   private final String USERNAME_DOESNT_EXIST = "That username does not exist.\nCheck for spelling, including proper case and no spaces.\n";
+   private final String THIS_IS_A_BUG = "This is a bug. Please contact the developer at " + DEV_EMAIL + " and this issue will be resolved.\nThank you for your cooperation.\n";
+   private final String SEARCH_WAS_NOT_SUCCESSFUL = "Search was not successful, please pick a different name.\nRemember, usernames must be at least 3 characters long.\n";
+   private final String ERROR = "\n!! ERROR !!";
 
    WOT_PlayerComp_V1()
    {
    
       set_up();
-      ensure_we_have_proper_username();
+      
+      do{
+      
+         program_Working = ensure_we_have_proper_username();
+      
+      }while(program_Working == false);
    
    }
    
@@ -58,56 +70,71 @@ class WOT_PlayerComp_V1
    
    }
    
-   void ensure_we_have_proper_username()
+   void pretty_Print(String text)
    {
    
+      String temp = JsonWriter.formatJson(text);
+      System.out.println("" + temp);
+   
+   }
+   
+   boolean ensure_we_have_proper_username()
+   {
+   
+      boolean result = true;//did the method succeed?
+   
       String temp;
+      String status;
+      JSONObject transfer = new JSONObject();
+      int count;//the number of names that the search returned
    
       System.out.println("Enter your username.");//prompts user to enter their username
       this.username = this.scan.next();//scans user input
          
-      this.status = read_URL(
+      result = read_URL(
          "http://api.worldoftanks.com/wot/account/list/?application_id=" + this.APP_ID
          + "&search=" + this.username
          + "&limit=" + this.LIMIT
          );//reads url to get the JSON data
       
-      // oppInfo = transfer;//transfers info to userinfo
-      // z = JSONObject.fromObject(oppInfo);//Stores info as a jsonobject
-      this.user_object = JSONObject.fromObject(this.response_from_URL);
-      temp = JsonWriter.formatJson(this.user_object.toString());
-      System.out.println("" + temp);
-      // status = "";//status is emptied
-      // status += z.get("status");//status will hold "ok" if the search was properly executed
-   //       
-      // if(status.equals("ok"))//if the search was properly executed
-      // {
-      //       
-         // transfer = "";//transfer is emptied
-         // JSONObject myMeta = z.getJSONObject("meta");
-         // transfer += myMeta.get("count");//transfer holds count which holds the number of possible names that would match up to input   
-         // count = Integer.parseInt(transfer);//turns count into a number to be better handled
-      //    
-      // }
-   //       
-      // if(!(status.equals("ok")))//if the search was not properly executed
-      // {
-      //    
-         // if(status.equals("error")){System.out.println("\n\nIT WAS AN ERROR\n\n");}
-      //    
-         // System.out.println("Search was not successful, please pick a different name. Remember, usernames must be at least 3 characters long.");//inform the user that the search was not properly executed
-         // myNameCorrectlyInputted = false;//set checker to false, so that the while loop will make it run back again
-      //    
-      // }
-      //    
-      // else if(count == 0)//if no names match up with input
-      // {
-      //       
-         // myNameCorrectlyInputted = false;//prevent user from exiting loop
-         // System.out.println("That username does not exist. Check for spelling, including proper case and no spaces.");//inform user of bad input
-      //       
-      // }
+      this.user_Object = JSONObject.fromObject(this.response_from_URL);//build a JSONObject
+      
+      status = this.user_Object.getString("status");//get status of search
+         
+      if(status.equals("ok"))//if the search was properly executed
+      {
+            
+         transfer = this.user_Object.getJSONObject("meta");
+         count = transfer.getInt("count");   
+         
+         if(count == 0)//if no names match up with input
+         {
+            
+            result = false;
+            System.out.println(USERNAME_DOESNT_EXIST);
+            
+         }
+         
+      }
+         
+      else if(status.equals("error"))
+      {
+                  
+         System.out.println(ERROR);
+         System.out.println(SEARCH_WAS_NOT_SUCCESSFUL);
+         result = false;
+                     
+      }
+      
+      else
+      {
+      
+         result = false;
+         System.out.println(THIS_IS_A_BUG);
+      
+      }
    
+      return result;
    
    }
    
@@ -120,7 +147,7 @@ class WOT_PlayerComp_V1
     //possible exceptions
       
       String input_Line;
-      boolean result;
+      boolean result = true;
           
       try
       {
@@ -128,6 +155,8 @@ class WOT_PlayerComp_V1
          URL oracle = new URL(webservice);
       
          BufferedReader in = new BufferedReader(new InputStreamReader(oracle.openStream()));
+      
+         this.response_from_URL = "";//must clear response so that we start anew each time
       
          while ((input_Line = in.readLine()) != null)
          {
@@ -155,7 +184,6 @@ class WOT_PlayerComp_V1
       
       }
       
-      System.out.println("\n\nYAYAYAYA\n\n");
       return result;
       
    }
