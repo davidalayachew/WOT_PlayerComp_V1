@@ -32,7 +32,7 @@ import javax.swing.JOptionPane;
 class WOT_PlayerComp_V1 
 {
 
-   private final String APP_ID = "4cb32cc3859abbef155c5c3d49d4b52b";
+   private final String APP_ID = "";
    private final int LIMIT = 1;
    private Scanner scan;
    
