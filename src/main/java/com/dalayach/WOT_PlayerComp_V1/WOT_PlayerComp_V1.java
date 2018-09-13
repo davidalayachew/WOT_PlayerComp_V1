@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import net.sf.json.JSONObject;
 import net.sf.json.JSONArray;
-import com.cedarsoftware.util.io.JsonWriter;
+import com.dalayach.File_Handler.File_Handler;
 
 import java.util.Scanner;
 import javax.swing.JOptionPane;
@@ -22,17 +22,18 @@ import javax.swing.JOptionPane;
  *   @author David Alayachew
  *   @version 0.1
  */
-   
-   //Links
-   //https://developers.wargaming.net/reference/all/wot/account/list/?application_id=4cb32cc3859abbef155c5c3d49d4b52b&r_realm=na
-   //https://developers.wargaming.net/reference/all/wot/account/info/?application_id=4cb32cc3859abbef155c5c3d49d4b52b&r_realm=na
+ 
+ //TODO
+ //we have 2 different sets of methods to retrieve user info - one for superficial data, and the other for player stats. It's time to build an all purpose function to handle both
+ //
+ //change print stats
 
 
 //driver class
 class WOT_PlayerComp_V1 
 {
-
-   private final String APP_ID = "";
+   
+   private final String APP_ID;
    private final int LIMIT = 1;
    private Scanner scan;
    
@@ -42,8 +43,8 @@ class WOT_PlayerComp_V1
    
    private String username;
    private String user_account_ID;
-   private JSONObject user_object;
-   private JSONObject user_play_records;
+   private JSONObject user_object;        //holds superficial info, such as ID number, region, etc.
+   private JSONObject user_stats;         //holds all the play records achieved by the user
    private int user_battle_avg_xp;
    private int user_hits_percents;
    private int user_XP;
@@ -54,8 +55,8 @@ class WOT_PlayerComp_V1
    
    private String enemy_username;
    private String enemy_user_account_ID;
-   private JSONObject enemy_user_object;
-   private JSONObject enemy_user_play_records;
+   private JSONObject enemy_user_object;        //holds superficial info, such as ID number, region, etc.
+   private JSONObject enemy_user_stats;         //holds all the play records achieved by the enemy user
    private int enemy_user_battle_avg_xp;
    private int enemy_user_hits_percents;
    private int enemy_user_XP;
@@ -75,40 +76,36 @@ class WOT_PlayerComp_V1
 
    WOT_PlayerComp_V1()
    {
-   
+         
+      this.APP_ID = File_Handler.fetch_Secret("WOT");
+         
       set_up();
       
       retrieve_user_ID();
       retrieve_user_data();
-      print_stats(this.username,
-         this.user_battle_avg_xp, 
-         this.user_hits_percents, 
-         this.user_XP, 
-         this.user_damage_ratio, 
-         this.user_win_ratio);
-   
+      print_stats(this.user_stats, this.username, this.user_damage_ratio, this.user_win_ratio);
+               
       do
       {
       
          retrieve_enemy_user_ID();
          retrieve_enemy_user_data();
-         print_stats(this.enemy_username,
-            this.enemy_user_battle_avg_xp, 
-            this.enemy_user_hits_percents, 
-            this.enemy_user_XP, 
-            this.enemy_user_damage_ratio, 
-            this.enemy_user_win_ratio);
+      
+         print_stats(this.enemy_user_stats, this.enemy_username, this.enemy_user_damage_ratio, this.enemy_user_win_ratio);
          
          if(question(COMPARE_TO_SELF) == true)
          {
          
-            compare_stats();
+            compare_stats(this.user_stats, this.enemy_user_stats);
          
          }
          
       }while(question(RESEARCH_ANOTHER_PLAYER) == true);
          
    }
+
+   void practice_method()
+   {}
 
    boolean question(String prompt)
    {
@@ -227,16 +224,16 @@ class WOT_PlayerComp_V1
    
    }
    
-   void compare_stats()
+   void compare_stats(JSONObject p1, JSONObject p2)
    {
    
       String clean_user_chance;
    
-      who_has_better("Average Battle Experience", this.user_battle_avg_xp, this.enemy_user_battle_avg_xp);
+      who_has_better("Average Battle Experience", p1.getDouble("battle_avg_xp"), p2.getDouble("battle_avg_xp"));
    
-      who_has_better("Average Percentage of Hits per Shot", this.user_hits_percents, this.enemy_user_hits_percents);
+      who_has_better("Average Percentage of Hits per Shot", p1.getDouble("hits_percents"), p2.getDouble("hits_percents"));
    
-      who_has_better("Lifetime EXP Total", this.user_XP, this.enemy_user_XP);
+      who_has_better("Lifetime EXP Total", p1.getDouble("xp"), p2.getDouble("xp"));
             
       who_has_better("Damage Dealt to Damage Received Ratio", this.user_damage_ratio, this.enemy_user_damage_ratio);
    
@@ -249,23 +246,16 @@ class WOT_PlayerComp_V1
    
    }
    
-   void print_stats(
-   String username,
-   int battle_avg_xp,
-   int hits_percents,
-   int XP, 
-   double damage_ratio, 
-   double win_ratio
-   )
+   void print_stats(JSONObject player, String username, double damage_ratio, double win_ratio)
    {
    
       String clean_damage_ratio = clean_up_trailing_decimal_digits(damage_ratio);
       String clean_win_ratio = clean_up_trailing_decimal_digits(win_ratio);
    
       print("Here are the statistics for the player " + username 
-            + "\n\n" + battle_avg_xp + " = Average Battle Experience\n" 
-            + hits_percents + "% = Average Percentage of Hits per Shot\n"
-            + XP + " = Lifetime EXP Total\n"
+            + "\n\n" + player.get("battle_avg_xp") + " = Average Battle Experience\n" 
+            + player.get("hits_percents") + "% = Average Percentage of Hits per Shot\n"
+            + player.get("xp") + " = Lifetime EXP Total\n"
             + clean_damage_ratio + "% = Damage Dealt to Damage Received Ratio\n"
             + clean_win_ratio + "% = Win Ratio\n\n");
    
@@ -277,23 +267,23 @@ class WOT_PlayerComp_V1
       String temp;
          
       temp = retrieve_all_stats(this.user_account_ID);
-      this.user_play_records = JSONObject.fromObject(temp);
+      this.user_stats = JSONObject.fromObject(temp);
       
-      this.user_battle_avg_xp = this.user_play_records.getInt("battle_avg_xp");
+      this.user_battle_avg_xp = this.user_stats.getInt("battle_avg_xp");
       
-      double wins = this.user_play_records.getInt("wins");
+      double wins = this.user_stats.getInt("wins");
    
-      double draws = this.user_play_records.getInt("draws");
+      double draws = this.user_stats.getInt("draws");
    
-      double losses = this.user_play_records.getInt("losses");
+      double losses = this.user_stats.getInt("losses");
          
-      this.user_hits_percents = this.user_play_records.getInt("hits_percents");
+      this.user_hits_percents = this.user_stats.getInt("hits_percents");
          
-      this.user_XP = this.user_play_records.getInt("xp");
+      this.user_XP = this.user_stats.getInt("xp");
    
-      double damage_dealt = this.user_play_records.getInt("damage_dealt");
+      double damage_dealt = this.user_stats.getInt("damage_dealt");
    
-      double damage_received = this.user_play_records.getInt("damage_received");
+      double damage_received = this.user_stats.getInt("damage_received");
    
       this.user_damage_ratio = damage_dealt/damage_received;
       this.user_damage_ratio *=100;
@@ -309,23 +299,23 @@ class WOT_PlayerComp_V1
       String temp;
          
       temp = retrieve_all_stats(this.enemy_user_account_ID);
-      this.enemy_user_play_records = JSONObject.fromObject(temp);
+      this.enemy_user_stats = JSONObject.fromObject(temp);
       
-      this.enemy_user_battle_avg_xp = this.enemy_user_play_records.getInt("battle_avg_xp");
+      this.enemy_user_battle_avg_xp = this.enemy_user_stats.getInt("battle_avg_xp");
       
-      double wins = this.enemy_user_play_records.getInt("wins");
+      double wins = this.enemy_user_stats.getInt("wins");
    
-      double draws = this.enemy_user_play_records.getInt("draws");
+      double draws = this.enemy_user_stats.getInt("draws");
    
-      double losses = this.enemy_user_play_records.getInt("losses");
+      double losses = this.enemy_user_stats.getInt("losses");
          
-      this.enemy_user_hits_percents = this.enemy_user_play_records.getInt("hits_percents");
+      this.enemy_user_hits_percents = this.enemy_user_stats.getInt("hits_percents");
          
-      this.enemy_user_XP = this.enemy_user_play_records.getInt("xp");
+      this.enemy_user_XP = this.enemy_user_stats.getInt("xp");
    
-      double damage_dealt = this.enemy_user_play_records.getInt("damage_dealt");
+      double damage_dealt = this.enemy_user_stats.getInt("damage_dealt");
    
-      double damage_received = this.enemy_user_play_records.getInt("damage_received");
+      double damage_received = this.enemy_user_stats.getInt("damage_received");
    
       this.enemy_user_damage_ratio = damage_dealt/damage_received;
       this.enemy_user_damage_ratio *=100;
@@ -338,7 +328,7 @@ class WOT_PlayerComp_V1
    String retrieve_all_stats(String ID)
    {
    
-      read_URL("http://api.worldoftanks.com/wot/account/info/?application_id=4cb32cc3859abbef155c5c3d49d4b52b&account_id=" + ID);
+      read_URL("http://api.worldoftanks.com/wot/account/info/?application_id=" + this.APP_ID + "&account_id=" + ID);
       this.temp_object = JSONObject.fromObject(this.response_from_URL);//retrieve and store all user play records
       
                   //goes through and captures all info on opponent
@@ -397,18 +387,26 @@ class WOT_PlayerComp_V1
    
    }
    
-   void set_up()
+   boolean set_up()
    {
    
-      this.scan = new Scanner(System.in);
-   
-   }
-   
-   void pretty_print(String text)
-   {
-   
-      String temp = JsonWriter.formatJson(text);
-      print("" + temp);
+      boolean success = true;
+      
+         
+      try
+      {
+      
+         this.scan = new Scanner(System.in);
+      
+         return success;
+      
+      }
+      catch(Exception e)
+      {
+      
+         return !success;
+      
+      }
    
    }
    
