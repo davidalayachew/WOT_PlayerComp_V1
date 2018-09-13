@@ -4,7 +4,7 @@
   <groupId>com.dalayach.WOT_PlayerComp_V1</groupId>
   <artifactId>WOT_PlayerComp_V1</artifactId>
   <packaging>jar</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <name>WOT_PlayerComp_V1</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -81,5 +81,12 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+
+    <dependency>
+      <groupId>com.dalayach.File_Handler</groupId>
+      <artifactId>File_Handler</artifactId>
+      <version>1.0</version>
+    </dependency>
+
   </dependencies>
 </project>
