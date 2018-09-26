@@ -20,13 +20,11 @@ import javax.swing.JOptionPane;
  *   
  *   
  *   @author David Alayachew
- *   @version 0.1
  */
  
  //TODO
- //we have 2 different sets of methods to retrieve user info - one for superficial data, and the other for player stats. It's time to build an all purpose function to handle both
- //
- //change print stats
+ //print_stats should only use the JSONObject
+ //Separate into 2 classes - one for retrieving data, and another for manipulating/presenting data
 
 
 //driver class
@@ -70,7 +68,7 @@ class WOT_PlayerComp_V1
    private final String SEARCH_WAS_NOT_SUCCESSFUL = "Search was not successful, please pick a different name.\nRemember, usernames must be at least 3 characters long.\n";
    private final String ERROR = "\n!! ERROR !!\n";
    private final String URL_DID_NOT_WORK = "It seems that the URL did not work.\n" + THIS_IS_A_BUG;
-   private final String ERROR_IN_STREAM = "It seems there was an error in opening the stream for the URL" + THIS_IS_A_BUG;
+   private final String ERROR_IN_STREAM = "It seems there was an error in opening the stream for the URL.\n" + THIS_IS_A_BUG;
    private final String COMPARE_TO_SELF = "\n\nWould you like to compare these statistics to yourself? (Y/N)";
    private final String RESEARCH_ANOTHER_PLAYER = "\n\nWould you like to research another player? (Y/N)";
 
@@ -104,17 +102,12 @@ class WOT_PlayerComp_V1
          
    }
 
-   void practice_method()
-   {}
-
    boolean question(String prompt)
    {
    
       boolean result = true;
-      boolean valid_response = true;
+      boolean valid_response = false;
       String choice;
-   
-   
          
       do
       {
@@ -144,7 +137,6 @@ class WOT_PlayerComp_V1
                break;
                
             default:
-               valid_response = false;
                print("INVALID RESPONSE\nTry again.\n\n");
                break;
                
