@@ -1,4 +1,4 @@
-!2335;s
+!2317;s
 J
 SAU0JGRASP_MAIN_BOUNDS=%<CONTROL_SHELL_BOUNDS>\012PATH+=%<JGRASP_PATHS>%;\012PATH=+%;%<JGRASP_C_PATHS>\012CYGWIN=nodosfilewarning\012GCC_COLORS=\012-Run\012ADD_EXE_PATH==Y\012
 SCU0JGRASP_MAIN_BOUNDS=%<CONTROL_SHELL_BOUNDS>\012PATH+=%<JGRASP_PATHS>%;\012PATH=+%;%<JGRASP_C_PATHS>\012CYGWIN=nodosfilewarning\012GCC_COLORS=\012-Run\012ADD_EXE_PATH==Y\012
@@ -9,10 +9,12 @@ SOU0JGRASP_MAIN_BOUNDS=%<CONTROL_SHELL_BOUNDS>\012PATH+=%<JGRASP_PATHS>%;\012PAT
 SyU0JGRASP_MAIN_BOUNDS=%<CONTROL_SHELL_BOUNDS>\012PATH+=%<PYTHON_PATH>%;\012PATH+=%<JGRASP_PATHS>%;\012CYGWIN=nodosfilewarning\012GCC_COLORS=
 SPU0
 s#i0
-s#k0C:\\Users\\David\\Documents\\__Programming\\SDK\\json-lib-2.4-jdk15\\json-lib-2.4-jdk15.jar\000\012C:\\Users\\David\\.m2\\repository\\com\\dalayach\\File_Handler\\File_Handler\\1.0-SNAPSHOT\\File_Handler-1.0-SNAPSHOT.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\commons-lang-2.6\\commons-lang-2.6.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\ezmorph-1.0.6\\ezmorph-1.0.6.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\commons-logging-1.2\\commons-logging-1.2.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\commons-collections-3.2.2\\commons-collections-3.2.2.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\commons-beanutils-1.9.3\\commons-beanutils-1.9.3.jar\000
+s#k0C:\\Users\\David\\Documents\\__Programming\\SDK\\json-lib-2.4-jdk15\\json-lib-2.4-jdk15.jar\000\012C:\\Users\\David\\.m2\\repository\\com\\dalayach\\File_Handler\\File_Handler\\1.0\\File_Handler-1.0.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\commons-lang-2.6\\commons-lang-2.6.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\ezmorph-1.0.6\\ezmorph-1.0.6.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\commons-logging-1.2\\commons-logging-1.2.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\commons-collections-3.2.2\\commons-collections-3.2.2.jar\000\012C:\\Users\\David\\Documents\\__Programming\\SDK\\commons-beanutils-1.9.3\\commons-beanutils-1.9.3.jar\000
 s#j0C:\\Users\\David\\Documents\\__Programming\\SDK\\json-lib-2.4-jdk15\\json-lib-2.4-jdk15.jar
 s#l0
-!62;g
+!122;g
 %\011com%sdalayach%sWOT_PlayerComp_V1%sWOT_PlayerComp_V1.java
-!62;f
+%\011com%sdalayach%sWOT_PlayerComp_V1%sGather_All_Data.java
+!122;f
 %\011com%sdalayach%sWOT_PlayerComp_V1%sWOT_PlayerComp_V1.java
+%\011com%sdalayach%sWOT_PlayerComp_V1%sGather_All_Data.java

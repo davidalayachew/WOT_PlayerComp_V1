@@ -15,8 +15,6 @@ import javax.swing.JOptionPane;
 
 
 /**  <p>This program is designed to inform the user of their percentage of chance to be able to beat an enemy player (on equal ground and in the same tank) in the game World Of Tanks based off of several factors such as battles won and average damage</p>
- *   <p>Last updated - August 26 2018</p>
- *   <p>Update status: Incomplete</p>
  *   
  *   
  *   @author David Alayachew
@@ -490,8 +488,7 @@ class WOT_PlayerComp_V1
     *
     */
    boolean read_URL(String webservice)
-   {//TODO -- add functionality to trigger uniquely for each of the
-    //possible exceptions
+   {
       
       String input_Line;
       boolean result = true;
