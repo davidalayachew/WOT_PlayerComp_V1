@@ -73,7 +73,7 @@ class WOT_PlayerComp_V1
    WOT_PlayerComp_V1()
    {
          
-      this.APP_ID = File_Handler.fetch_Secret("WOT");
+      this.APP_ID = File_Handler.fetch_Secret("WOT"); //this is so people don't abuse my app id
          
       set_up();
       
@@ -131,6 +131,10 @@ class WOT_PlayerComp_V1
             case "No":
             case "NO":
                result = false;
+               valid_response = true;
+               break;
+               
+               case "q":
                valid_response = true;
                break;
                
