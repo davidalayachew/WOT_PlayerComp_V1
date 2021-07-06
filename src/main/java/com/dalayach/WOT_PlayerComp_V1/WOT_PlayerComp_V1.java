@@ -6,23 +6,25 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONArray;
-import com.dalayach.File_Handler.File_Handler;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
 
 import java.util.Scanner;
 import javax.swing.JOptionPane;
 
 
-/**  <p>This program is designed to inform the user of their percentage of chance to be able to beat an enemy player (on equal ground and in the same tank) in the game World Of Tanks based off of several factors such as battles won and average damage</p>
+/** <p>This program is designed to inform the user of their percentage of chance to be able to
+ *  beat an enemy player (on equal ground and in the same tank) in the game World Of Tanks
+ *  based off of several factors such as battles won and average damage</p>
  *   
  *   
  *   @author David Alayachew
  */
  
  //TODO
- //print_stats should only use the JSONObject
- //Separate into 2 classes - one for retrieving data, and another for manipulating/presenting data
+ //print_stats should only use the JsonObject
+ //Separate into 2 classes - one for retrieving data, and another for manipulating/presenting
+ //data
 
 
 //driver class
@@ -34,25 +36,14 @@ class WOT_PlayerComp_V1
    private Scanner scan;
    
    private String response_from_URL = "";
-   private JSONObject temp_object;
-   private JSONArray temp_array;
-   
-   private String username;
-   private String user_account_ID;
-   private JSONObject user_object;        //holds superficial info, such as ID number, region, etc.
-   private JSONObject user_stats;         //holds all the play records achieved by the user
-   private int user_battle_avg_xp;
-   private int user_hits_percents;
-   private int user_XP;
-   private double user_damage_ratio;
-   private double user_win_ratio;
-   private double user_chance = 0;
+   private JsonObject temp_object;
+   private JsonArray temp_array;
    
    
    private String enemy_username;
    private String enemy_user_account_ID;
-   private JSONObject enemy_user_object;        //holds superficial info, such as ID number, region, etc.
-   private JSONObject enemy_user_stats;         //holds all the play records achieved by the enemy user
+   private JsonObject enemy_user_object;        //holds superficial info, such as ID number, region, etc.
+   private JsonObject enemy_user_stats;         //holds all the play records achieved by the enemy user
    private int enemy_user_battle_avg_xp;
    private int enemy_user_hits_percents;
    private int enemy_user_XP;
@@ -72,8 +63,6 @@ class WOT_PlayerComp_V1
 
    WOT_PlayerComp_V1()
    {
-         
-      this.APP_ID = File_Handler.fetch_Secret("WOT"); //this is so people don't abuse my app id
          
       set_up();
       
@@ -134,7 +123,7 @@ class WOT_PlayerComp_V1
                valid_response = true;
                break;
                
-               case "q":
+            case "q":
                valid_response = true;
                break;
                
@@ -218,7 +207,7 @@ class WOT_PlayerComp_V1
    
    }
    
-   void compare_stats(JSONObject p1, JSONObject p2)
+   void compare_stats(JsonObject p1, JsonObject p2)
    {
    
       String clean_user_chance;
@@ -240,7 +229,7 @@ class WOT_PlayerComp_V1
    
    }
    
-   void print_stats(JSONObject player, String username, double damage_ratio, double win_ratio)
+   void print_stats(JsonObject player, String username, double damage_ratio, double win_ratio)
    {
    
       String clean_damage_ratio = clean_up_trailing_decimal_digits(damage_ratio);
@@ -261,7 +250,7 @@ class WOT_PlayerComp_V1
       String temp;
          
       temp = retrieve_all_stats(this.user_account_ID);
-      this.user_stats = JSONObject.fromObject(temp);
+      this.user_stats = JsonObject.fromObject(temp);
       
       this.user_battle_avg_xp = this.user_stats.getInt("battle_avg_xp");
       
@@ -293,7 +282,7 @@ class WOT_PlayerComp_V1
       String temp;
          
       temp = retrieve_all_stats(this.enemy_user_account_ID);
-      this.enemy_user_stats = JSONObject.fromObject(temp);
+      this.enemy_user_stats = JsonObject.fromObject(temp);
       
       this.enemy_user_battle_avg_xp = this.enemy_user_stats.getInt("battle_avg_xp");
       
@@ -323,18 +312,18 @@ class WOT_PlayerComp_V1
    {
    
       read_URL("http://api.worldoftanks.com/wot/account/info/?application_id=" + this.APP_ID + "&account_id=" + ID);
-      this.temp_object = JSONObject.fromObject(this.response_from_URL);//retrieve and store all user play records
+      this.temp_object = JsonObject.fromObject(this.response_from_URL);//retrieve and store all user play records
       
                   //goes through and captures all info on opponent
          
-         /** goes into the JSONObject to retrieve data */
-      this.temp_object = this.temp_object.getJSONObject("data");
+         /** goes into the JsonObject to retrieve data */
+      this.temp_object = this.temp_object.getJsonObject("data");
          /** goes into data to retrieve userID */
-      this.temp_object = this.temp_object.getJSONObject(ID);
+      this.temp_object = this.temp_object.getJsonObject(ID);
          /** goes into ID to retrieve stats */
-      this.temp_object = this.temp_object.getJSONObject("statistics");
+      this.temp_object = this.temp_object.getJsonObject("statistics");
          /** goes into stats to get the general data under the label "all" */
-      this.temp_object = this.temp_object.getJSONObject("all");
+      this.temp_object = this.temp_object.getJsonObject("all");
       
       return this.temp_object.toString();
    
@@ -349,7 +338,7 @@ class WOT_PlayerComp_V1
       
       }while(ensure_we_have_proper_username(this.username) != true);
       
-      this.user_object = JSONObject.fromObject(this.response_from_URL);//now that we know the proper username, we set user_object
+      this.user_object = JsonObject.fromObject(this.response_from_URL);//now that we know the proper username, we set user_object
       
       this.user_account_ID = retrieve_account_id(this.user_object);
       print("Here is your userID - " + this.user_account_ID + "\n\n");
@@ -365,7 +354,7 @@ class WOT_PlayerComp_V1
       
       }while(ensure_we_have_proper_username(this.enemy_username) != true);
       
-      this.enemy_user_object = JSONObject.fromObject(this.response_from_URL);//now that we know the proper username, we set user_object
+      this.enemy_user_object = JsonObject.fromObject(this.response_from_URL);//now that we know the proper username, we set user_object
       
       this.enemy_user_account_ID = retrieve_account_id(this.enemy_user_object);
       print("Here is the enemy's userID - " + this.enemy_user_account_ID + "\n\n");
@@ -419,7 +408,7 @@ class WOT_PlayerComp_V1
    
       String temp;
       String status;
-      JSONObject transfer = new JSONObject();
+      JsonObject transfer = new JsonObject();
       int count;//the number of names that the search returned
    
    
@@ -430,14 +419,14 @@ class WOT_PlayerComp_V1
          + "&limit=" + this.LIMIT
          );//reads url to get the JSON data
       
-      this.temp_object = JSONObject.fromObject(this.response_from_URL);//build a JSONObject
+      this.temp_object = JsonObject.fromObject(this.response_from_URL);//build a JsonObject
       
       status = this.temp_object.getString("status");//get status of search
          
       if(status.equals("ok"))//if the search was properly executed
       {
             
-         transfer = this.temp_object.getJSONObject("meta");
+         transfer = this.temp_object.getJsonObject("meta");
          count = transfer.getInt("count");   
          
          if(count == 0)//if no names match up with input
@@ -471,15 +460,15 @@ class WOT_PlayerComp_V1
    
    }
    
-   String retrieve_account_id(JSONObject object)
+   String retrieve_account_id(JsonObject object)
    {
           
       String result = "";
                   
       /** json array is made from data */
-      this.temp_array = object.getJSONArray("data");
-      /** 1st element from array of JSONObjects is stored into a JSONObject */
-      this.temp_object = this.temp_array.getJSONObject(0);
+      this.temp_array = object.getJsonArray("data");
+      /** 1st element from array of JsonObjects is stored into a JsonObject */
+      this.temp_object = this.temp_array.getJsonObject(0);
       
       result = this.temp_object.getString("account_id");
    

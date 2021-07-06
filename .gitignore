@@ -1,1 +1,7 @@
 target/
+bin/
+docs/
+help/
+ignore/
+*.class
+*DO_NOT_COMMIT.txt
